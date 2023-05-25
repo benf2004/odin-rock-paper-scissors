@@ -10,6 +10,12 @@ function getComputerChoice(){
         return "scissors"
     }
 }
+let playerWins; let computerWins;
+function resetBoard() {
+    playerWins = 0;
+    computerWins = 0;
+}
+resetBoard()
 
 function capitalize(word){
     return word.charAt(0).toUpperCase() + word.slice(1)
@@ -22,30 +28,38 @@ function playRound(playerSelection, computerSelection){
     const player_win = "paperrock scissorspaper rockscissors";
     const roundResult = ps + cs
     if (computer_win.includes(roundResult)){
-        return `You lose! ${capitalize(cs)} beats ${ps}.`
+        let msg = `You lose! ${capitalize(cs)} beats ${ps}.`
+        handleWin(msg, "computer")
     }
     else if (player_win.includes(roundResult)){
-        return `You win! ${capitalize(ps)} beats ${cs}.`
-    }
-    else if (ps === cs){
-        return `You tied!`
+        let msg = `You win! ${capitalize(ps)} beats ${cs}.`
+        handleWin(msg, "player")
     }
     else {
-        return "Uh oh! Not a valid input!"
+        let msg = `You tied!`
+        handleWin(msg, "tie")
     }
 }
 
-function game(){
-    let playerScore = 0;
-    let computerScore = 0;
-    for (let i = 0; i < 5; i++) {
-        let gameResult = playRound(prompt("Choose rock, paper, or scissors"), getComputerChoice())
-        console.log(gameResult)
-        let playerWin = gameResult.charAt(4) === "w"
-        let computerWin = gameResult.charAt(4) === "l"
-        if (playerWin) playerScore += 1
-        else if (computerWin) computerScore += 1
-    }
-    console.log(`The final score is:\n Player: ${playerScore} \n Computer: ${computerScore}`)
+function triggerEnd(){
+    const playerWon = playerWins >= 5
+    let winner_message = ""
+    if (playerWon) winner_message = "Congrats! You won!"
+    else winner_message = "Wah wah wah... you lost..."
+    document.getElementById("winnerMsg").innerText = winner_message
+    resetBoard()
 }
-game()
+
+function handleWin(message, winner){
+    document.getElementById("winMsg").innerText = message
+    if (winner === "player") playerWins++
+    if (winner === "computer") computerWins++
+    document.getElementById("playerScore").innerText = playerWins.toString()
+    document.getElementById("computerScore").innerText = computerWins.toString()
+    if (playerWins >= 5 || computerWins >= 5) triggerEnd()
+}
+
+const btns = document.querySelectorAll(".btn")
+for (let btn of btns){
+    btn.addEventListener("click", () => playRound(btn.id, getComputerChoice()))
+}
